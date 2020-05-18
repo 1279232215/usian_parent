@@ -20,6 +20,7 @@ public class ItemParamController {
     @Autowired
     private TbItemParamService tbItemParamService;
 
+    //查询商品规格参数
     @RequestMapping("/selectItemParamByItemCatId/{itemCatId}")
     public TbItemParam selectItemCategoryByParentId(@PathVariable Long itemCatId){
         return tbItemParamService.selectItemParamByItemCatId(itemCatId);

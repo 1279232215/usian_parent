@@ -16,6 +16,7 @@ public class ItemCatController {
     @Autowired
     private TbItemCatService tbItemCatService;
 
+    //查询商品类目
     @RequestMapping("/selectItemCategoryByParentId")
     public List<TbItemCat> selectItemCategoryByParentId(@RequestParam Long id){
         return tbItemCatService.selectItemCategoryByParentId(id);

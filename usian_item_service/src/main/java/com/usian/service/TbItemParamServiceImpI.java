@@ -13,12 +13,14 @@ import java.util.List;
 public class TbItemParamServiceImpI implements TbItemParamService {
     @Autowired
     private TbItemParamMapper tbItemParamMapper;
+
+    //查询商品规格模板
     @Override
     public TbItemParam selectItemParamByItemCatId(Long itemCatId) {
         TbItemParamExample tbItemParamExample = new TbItemParamExample();
         TbItemParamExample.Criteria criteria = tbItemParamExample.createCriteria();
-        criteria.andItemCatIdEqualTo(itemCatId);
-        List<TbItemParam> itemParams = tbItemParamMapper.selectByExampleWithBLOBs(tbItemParamExample);
+        criteria.andItemCatIdEqualTo(itemCatId); //设置条件
+        List<TbItemParam> itemParams = tbItemParamMapper.selectByExampleWithBLOBs(tbItemParamExample);//因为selectByExample()默认描述是个大容量默认不查询，BlOBs是可以查描述了
         if(itemParams!=null && itemParams.size()>0){
             return itemParams.get(0);
         }

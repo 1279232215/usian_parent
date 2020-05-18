@@ -14,12 +14,14 @@ import java.util.List;
 public class TbItemCatServiceImpI implements TbItemCatService{
     @Autowired
     private TbItemCatMapper tbItemCatMapper;
+
+    //根据parent查询商品类目
     @Override
     public List<TbItemCat> selectItemCategoryByParentId(Long id) {
-        TbItemCatExample tbItemCatExample = new TbItemCatExample();
-        TbItemCatExample.Criteria criteria = tbItemCatExample.createCriteria();
-        criteria.andParentIdEqualTo(id);
-        criteria.andStatusEqualTo(1);
+        TbItemCatExample tbItemCatExample = new TbItemCatExample(); //创建逆向工程的工具类
+        TbItemCatExample.Criteria criteria = tbItemCatExample.createCriteria();//创建where
+        criteria.andParentIdEqualTo(id);//判断parentId
+        criteria.andStatusEqualTo(1);//没有下架的商品
         List<TbItemCat> tbItemCats = tbItemCatMapper.selectByExample(tbItemCatExample);
         return tbItemCats;
     }

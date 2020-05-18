@@ -17,4 +17,8 @@ public interface TbItemService {
      *  @return
      */
     PageResult selectTbItemAllByPage(Integer page, Long rows);
+
+    Integer insertTbItem(TbItem tbItem, String desc, String itemParams);
+
+    int deleteItemById(Long itemId);
 }
