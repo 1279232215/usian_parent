@@ -59,13 +59,14 @@ public class ItemController {
         return Result.error("删除失败");//返回错误提示
     }
 
+    //修改回显
     @RequestMapping("/preUpdateItem")
     public Result preUpdateItem(Long itemId){
-        Map<String,Object> map = itemServiceFeign.preUpdateItem(itemId);
-        String data = JsonUtils.objectToJson(map);
-        if(map.size()>0&&map!=null){
-            return Result.ok(data);
+        Map<String,Object> map = itemServiceFeign.preUpdateItem(itemId);//返回map
+        String data = JsonUtils.objectToJson(map);                  //把map转为json传进行返回
+        if(map.size()>0&&map!=null){                    //判断map是否为空
+            return Result.ok(data);                 //返回data
         }
-        return Result.error("修改回显失败！！！");
+        return Result.error("修改回显失败！！！"); //返回错误数据
     }
 }

@@ -65,15 +65,37 @@ public interface ItemServiceFeign {
     @RequestMapping("/service/item/deleteItemById")
     int deleteItemById(@RequestParam Long itemId);
 
+    /**
+     *  根据itemId删除TbItem
+     *  @param itemId id
+     *  @return int
+     */
     @RequestMapping("/service/item/preUpdateItem")
     Map<String, Object> preUpdateItem(@RequestParam Long itemId);
 
+    /**
+     *  查询tbItem表,封装为pageResult
+     *  @param page 当前页
+     *  @param rows 每页展示多少条
+     *  @return int
+     */
     @RequestMapping("/service/itemParam/selectItemParamAll")
     PageResult selectItemParamAll(@RequestParam Integer page,@RequestParam Integer rows);
 
+    /**
+     *  根据主键id删除TbItemParam
+     *  @param id
+     *  @return int
+     */
     @RequestMapping("/service/itemParam/deleteItemParamById")
     int deleteItemParamById(@RequestParam Long id);
 
+    /**
+     *  添加tbItemParam
+     *  @param itemCatId
+     *  @param paramData
+     *  @return int
+     */
     @RequestMapping("/service/itemParam/insertItemParam")
     int insertItemParam(@RequestParam Long itemCatId,@RequestParam String paramData);
 }
