@@ -1,7 +1,5 @@
 package com.usian.controller;
 
-import com.github.pagehelper.PageHelper;
-import com.netflix.discovery.converters.Auto;
 import com.usian.service.TbItemService;
 import com.usian.pojo.TbItem;
 import com.usian.utils.PageResult;
@@ -10,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/service/item")
@@ -46,5 +46,10 @@ public class ItemController {
     @RequestMapping("/deleteItemById")
     public int deleteItemById(@RequestParam Long itemId){
        return tbItemService.deleteItemById(itemId);
+    }
+
+    @RequestMapping("/preUpdateItem")
+    public Map<String,Object> preUpdateItem(@RequestParam Long itemId){
+        return tbItemService.preUpdateItem(itemId);
     }
 }

@@ -1,14 +1,15 @@
 package com.usian.controller;
-
+import com.bjsxt.utils.JsonUtils;
 import com.usian.feign.ItemServiceFeign;
 import com.usian.pojo.TbItem;
 import com.bjsxt.utils.Result;
 import com.usian.utils.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/backend/item")
@@ -56,5 +57,15 @@ public class ItemController {
             return Result.ok();//返回前台删除正确
         }
         return Result.error("删除失败");//返回错误提示
+    }
+
+    @RequestMapping("/preUpdateItem")
+    public Result preUpdateItem(Long itemId){
+        Map<String,Object> map = itemServiceFeign.preUpdateItem(itemId);
+        String data = JsonUtils.objectToJson(map);
+        if(map.size()>0&&map!=null){
+            return Result.ok(data);
+        }
+        return Result.error("修改回显失败！！！");
     }
 }

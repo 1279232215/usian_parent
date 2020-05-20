@@ -1,14 +1,13 @@
 package com.usian.service;
 
+import com.bjsxt.utils.JsonUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.usian.mapper.TbItemCatMapper;
 import com.usian.mapper.TbItemDescMapper;
 import com.usian.mapper.TbItemMapper;
 import com.usian.mapper.TbItemParamItemMapper;
-import com.usian.pojo.TbItem;
-import com.usian.pojo.TbItemDesc;
-import com.usian.pojo.TbItemExample;
-import com.usian.pojo.TbItemParamItem;
+import com.usian.pojo.*;
 import com.usian.utils.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.bjsxt.utils.IDUtils;
@@ -17,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -31,6 +32,9 @@ public class TbItemServiceImpI implements TbItemService{
 
     @Autowired
     private TbItemParamItemMapper tbItemParamItemMapper;
+
+    @Autowired
+    private TbItemCatMapper tbItemCatMapper;
 
     //根据id查询商品基本信息
     @Override
@@ -76,11 +80,14 @@ public class TbItemServiceImpI implements TbItemService{
         int tbItemDescNum = tbItemDescMapper.insertSelective(tbItemDesc);
         //添加TbItemParam数据
         TbItemParamItem tbItemParamItem = new TbItemParamItem();
-        tbItemParamItem.setId(itemId);
         tbItemParamItem.setCreated(date);
         tbItemParamItem.setParamData(itemParams);
+        tbItemParamItem.setItemId(itemId);
         tbItemParamItem.setUpdated(date);
+        System.out.println(tbItemParamItem.getParamData());
+        System.out.println(tbItemParamItem+"+++++++++++++++++++++++++++++++++++++");
         int tbItemParamItemNum = tbItemParamItemMapper.insertSelective(tbItemParamItem);
+        System.out.println(tbItemParamItemNum+"-------------------");
         return tbItemNum+tbItemDescNum+tbItemParamItemNum;//返回3条insert的执行影响条数
     }
 
@@ -91,4 +98,35 @@ public class TbItemServiceImpI implements TbItemService{
         //deleteByExample()根据条件删除
         return tbItemMapper.deleteByPrimaryKey(itemId);
     }
+
+    @Override
+    public Map<String, Object> preUpdateItem(Long itemId) {
+        //定义map集合
+        Map<String,Object> map = new HashMap<>();
+        //查询tbItem表
+        TbItem tbItem = tbItemMapper.selectByPrimaryKey(itemId);
+        //将tbItem存入Map集合
+        map.put("item",tbItem);
+
+        //根据商品ID查询商品描述
+        TbItemDesc tbItemDesc = tbItemDescMapper.selectByPrimaryKey(itemId);
+        //将TbItemDesc存入map中
+        map.put("itemDesc",tbItemDesc);
+
+        //根据商品ID查询商品类目
+        TbItemCat tbItemCat = tbItemCatMapper.selectByPrimaryKey(tbItem.getCid());
+        //将itemCat存入map
+        map.put("itemCat",tbItemCat);
+
+        //根据商品ID查询TbItemParamItem
+        TbItemParamItemExample tbItemParamItemExample = new TbItemParamItemExample();
+        TbItemParamItemExample.Criteria criteria = tbItemParamItemExample.createCriteria();
+        criteria.andItemIdEqualTo(itemId);
+        List<TbItemParamItem> tbItemParamItems = tbItemParamItemMapper.selectByExampleWithBLOBs(tbItemParamItemExample);
+        System.out.println(tbItemParamItems+"****************************");
+        map.put("itemParamItem",tbItemParamItems.get(0));
+
+        return map;
+    }
+
 }

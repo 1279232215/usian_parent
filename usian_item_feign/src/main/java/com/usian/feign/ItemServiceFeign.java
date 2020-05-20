@@ -8,6 +8,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @FeignClient(value = "usian-item-service")
 public interface ItemServiceFeign {
@@ -63,4 +64,7 @@ public interface ItemServiceFeign {
      */
     @RequestMapping("/service/item/deleteItemById")
     int deleteItemById(@RequestParam Long itemId);
+
+    @RequestMapping("/service/item/preUpdateItem")
+    Map<String, Object> preUpdateItem(@RequestParam Long itemId);
 }
