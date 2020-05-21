@@ -24,4 +24,35 @@ public class ContentCategoryController {
         }
         return Result.error("查无结果！！！");//返回错误数据
     }
+
+    //添加内容分类管理
+    @RequestMapping("/insertContentCategory")
+    public Result insertContentCategory(TbContentCategory tbContentCategory){
+        int i = contentServiceFeign.insertContentCategory(tbContentCategory);
+        if(i==2){
+            return Result.ok();
+        }
+        return Result.error("内容分类管理添加失败！！！");
+    }
+
+    //内容分类管理删除
+    @RequestMapping("/deleteContentCategoryById")
+    public Result deleteContentCategoryById(Long categoryId){
+        int num = contentServiceFeign.deleteContentCategoryById(categoryId);
+        if(num==200){
+            return Result.ok();
+        }
+        return Result.error("内容分类管理删除失败!!!");
+    }
+
+    //内容分类管理修改
+    @RequestMapping("/updateContentCategory")
+    public Result updateContentCategory(Long id,String name){
+        int num = contentServiceFeign.updateContentCategory(id,name);
+        if(num==1){
+            return Result.ok();
+        }
+        return Result.error("内容分类管理修改失败!!!");
+    }
+
 }

@@ -41,7 +41,7 @@ public class ItemParamController {
 
     //根据id删除商品规格
     @RequestMapping("/deleteItemParamById")
-    public int insertItemParam(Long id){
+    public int deleteItemParamById(Long id){
         return tbItemParamService.deleteItemParamById(id);
     }
  }
