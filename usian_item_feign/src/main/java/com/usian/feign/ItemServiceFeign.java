@@ -3,6 +3,7 @@ package com.usian.feign;
 import com.usian.pojo.TbItem;
 import com.usian.pojo.TbItemCat;
 import com.usian.pojo.TbItemParam;
+import com.usian.utils.CatResult;
 import com.usian.utils.PageResult;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -98,4 +99,11 @@ public interface ItemServiceFeign {
      */
     @RequestMapping("/service/itemParam/insertItemParam")
     int insertItemParam(@RequestParam Long itemCatId,@RequestParam String paramData);
+
+    /**
+     *  查询左侧商品分类目录
+     *  @return CatResult 自定义util封装类
+     */
+    @RequestMapping("/service/itemCat/selectItemCategoryAll")
+    CatResult selectItemCategoryAll();
 }

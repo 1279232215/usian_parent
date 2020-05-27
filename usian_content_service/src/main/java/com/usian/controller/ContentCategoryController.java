@@ -32,7 +32,7 @@ public class ContentCategoryController {
         return contentCategoryService.deleteContentCategoryById(categoryId);
     }
 
-    //内容分类管理删除
+    //内容分类管理修改
     @RequestMapping("/updateContentCategory")
     public int updateContentCategory(Long id,String name){
         return contentCategoryService.updateContentCategory(id,name);
