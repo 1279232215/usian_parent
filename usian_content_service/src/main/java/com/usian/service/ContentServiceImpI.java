@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.usian.mapper.TbContentMapper;
 import com.usian.pojo.TbContent;
 import com.usian.pojo.TbContentExample;
+import com.usian.redis.RedisClient;
 import com.usian.utils.AdNode;
 import com.usian.utils.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,12 @@ public class ContentServiceImpI implements ContentService {
     @Value("${AD_WIDTHB}")
     private Integer AD_WIDTHB;
 
+    @Value("${portal_ad_redis_key}")
+    private String portal_ad_redis_key;
+
+    @Autowired
+    private RedisClient redisClient;
+
     @Autowired
     private TbContentMapper tbContentMapper;
 
@@ -61,18 +68,25 @@ public class ContentServiceImpI implements ContentService {
         tbContent.setUpdated(date);
         tbContent.setCreated(date);
         int i = tbContentMapper.insertSelective(tbContent);
+        redisClient.hdel(portal_ad_redis_key,AD_CATEGORY_ID.toString());
         return i;
     }
 
     //内容分类删除
     @Override
     public int deleteContentByIds(Long id) {
+        redisClient.hdel(portal_ad_redis_key,AD_CATEGORY_ID.toString());
         return tbContentMapper.deleteByPrimaryKey(id);
     }
 
     //前台首页大广告查询
     @Override
     public List<AdNode> selectFrontendContentByAD() {
+        //先去redis缓存中查询List<AdNode>
+        List<AdNode> redisAdNodeList = (List<AdNode>) redisClient.hget(portal_ad_redis_key,AD_CATEGORY_ID.toString());
+        if(redisAdNodeList!=null && redisAdNodeList.size()>0){
+            return redisAdNodeList;
+        }
         TbContentExample tbContentExample = new TbContentExample();
         TbContentExample.Criteria criteria = tbContentExample.createCriteria();
         criteria.andCategoryIdEqualTo(AD_CATEGORY_ID);
@@ -90,6 +104,8 @@ public class ContentServiceImpI implements ContentService {
             adNode.setWidthB(AD_WIDTHB);
             adNodeList.add(adNode);
         }
+        //上面if没有生效就走数据库，查到数据添加到缓存
+        redisClient.hset(portal_ad_redis_key,AD_CATEGORY_ID.toString(),adNodeList);
         return adNodeList;
     }
 }
