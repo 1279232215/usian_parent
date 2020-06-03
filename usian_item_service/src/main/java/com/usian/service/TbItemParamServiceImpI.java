@@ -56,10 +56,6 @@ public class TbItemParamServiceImpI implements TbItemParamService {
         TbItemParamExample.Criteria criteria = tbItemParamExample.createCriteria();
         criteria.andItemCatIdEqualTo(itemCatId);
         List<TbItemParam> itemParamsList = tbItemParamMapper.selectByExample(tbItemParamExample);
-        for (TbItemParam t:
-                itemParamsList) {
-            System.out.println(t+"=========================");
-        }
         if(itemParamsList.size()>0){
             return 0;
         }

@@ -194,7 +194,7 @@ public class RedisClient {
      * @param values 值 可以是多个
      * @return 移除的个数
      */
-    public long setRemove(String key, Object ...values) {
+    public long srem(String key, Object ...values) {
         try {
             Long count = redisTemplate.opsForSet().remove(key, values);
             return count;
@@ -229,7 +229,7 @@ public class RedisClient {
      */
     public boolean lpush(String key, Object value) {
         try {
-            redisTemplate.opsForList().rightPush(key, value);
+            redisTemplate.opsForList().leftPush(key, value);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -245,7 +245,22 @@ public class RedisClient {
      */
     public boolean lpush(String key, List<Object> value) {
         try {
-            redisTemplate.opsForList().rightPushAll(key, value);
+            redisTemplate.opsForList().leftPushAll(key, value);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    /**
+     * 将list放入缓存
+     * @param key 键
+     * @param value 值
+     * @return
+     */
+    public boolean rpush(String key, Object value) {
+        try {
+            redisTemplate.opsForList().rightPush(key, value);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -253,6 +268,21 @@ public class RedisClient {
         }
     }
 
+    /**
+     * 将list放入缓存
+     * @param key 键
+     * @param value 值
+     * @return
+     */
+    public boolean rpush(String key, List<Object> value) {
+        try {
+            redisTemplate.opsForList().rightPushAll(key, value);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     /**
      * 移除N个值为value
      * @param key 键
