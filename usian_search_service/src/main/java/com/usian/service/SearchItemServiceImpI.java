@@ -53,7 +53,7 @@ public class SearchItemServiceImpI implements SearchItemService {
                 }
                 BulkRequest bulkRequest = new BulkRequest();
                 for (SearchItem searchItem : itemList) {
-                    bulkRequest.add(new IndexRequest(ES_INDEX_NAME,ES_TYPE_NAME).source(JsonUtils.objectToJson(searchItem),XContentType.JSON));
+                    bulkRequest.add(new IndexRequest(ES_INDEX_NAME,ES_TYPE_NAME,searchItem.getId()).source(JsonUtils.objectToJson(searchItem),XContentType.JSON));
                 }
                 restHighLevelClient.bulk(bulkRequest,RequestOptions.DEFAULT);
                 page++;
