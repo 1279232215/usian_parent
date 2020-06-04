@@ -58,6 +58,7 @@ public class SearchItemServiceImpI implements SearchItemService {
                 restHighLevelClient.bulk(bulkRequest,RequestOptions.DEFAULT);
                 page++;
             }
+            return true;
         }catch (Exception e){
             e.printStackTrace();
         }
