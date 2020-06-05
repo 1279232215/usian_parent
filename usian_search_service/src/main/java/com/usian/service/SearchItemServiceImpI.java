@@ -10,17 +10,27 @@ import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import com.bjsxt.utils.JsonUtils;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -63,6 +73,68 @@ public class SearchItemServiceImpI implements SearchItemService {
             e.printStackTrace();
         }
         return false;
+    }
+
+
+    /**
+     * 分页查询名字、类别、描述、卖点包含q的商品
+     * @param q
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public List<SearchItem> selectByQ(String q, Integer page, Integer pageSize) {
+        try{
+            //前台传过来条件，根据条件对标题，分类名,描述，和卖点
+            //创建查询请求对象，将索引名传过去
+            SearchRequest searchRequest = new SearchRequest(ES_INDEX_NAME);
+            //传类型名字
+            searchRequest.types(ES_TYPE_NAME);
+            // 搜索源构建对象
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            //用multiMatch，用什么查，查那些字段
+            searchSourceBuilder.query(QueryBuilders.multiMatchQuery(q,new String[]{"item_title","item_desc","item_sell_point","item_category_name"}));
+            /*
+            *   设置分页
+            *   第一次 0 20
+            *   第二次 20 20
+            *   第三次 40 20
+            *   第四次 60 20
+            *   得出
+            *   (page-1)*20
+            * */
+            searchSourceBuilder.from((page-1)*20);
+            searchSourceBuilder.size(pageSize);
+            //设置高亮构建对象
+            HighlightBuilder highlightBuilder = new HighlightBuilder();
+            highlightBuilder.postTags("<font color=red>");
+            highlightBuilder.preTags("</font>");
+            highlightBuilder.field("item_title");
+            //给搜索源对象赋值
+            searchSourceBuilder.highlighter(highlightBuilder);
+            //设置搜索源
+            searchRequest.source(searchSourceBuilder);
+            SearchResponse response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+            List<SearchItem> searchItemList = new ArrayList<>();
+            SearchHit[] hits = response.getHits().getHits();
+            for (int i = 0; i < hits.length; i++) {
+                SearchHit hit = hits[i];
+                SearchItem searchItem = JsonUtils.jsonToPojo(hit.getSourceAsString(), SearchItem.class);
+                Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+                HighlightField item_title = highlightFields.get("item_title");
+                if(item_title!=null){
+                    searchItem.setItem_title(item_title.getFragments()[0].toString());
+                }
+                searchItemList.add(searchItem);
+            }
+            return searchItemList;
+            //进行分页从第0条开始每页展示20条
+            //设置查询出来的高亮
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
