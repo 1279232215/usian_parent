@@ -10,6 +10,7 @@ import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import com.bjsxt.utils.JsonUtils;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -135,6 +136,27 @@ public class SearchItemServiceImpI implements SearchItemService {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    //当商品添加时会通过mq发送过来商品的id做索引同步
+    @Override
+    public boolean insertDocument(String msg) {
+        try {
+            //根据新添商品id查询3表联合数据
+            SearchItem searchItem = searchItemMapper.selectSearchItemByItemId(msg);
+            //同步索引
+            IndexRequest indexRequest = new IndexRequest(ES_INDEX_NAME,ES_TYPE_NAME,searchItem.getId());
+            indexRequest.source(JsonUtils.objectToJson(searchItem),XContentType.JSON);
+            IndexResponse response = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+            int failed = response.getShardInfo().getFailed();//错误的条数
+            if(failed==0){
+                return true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**

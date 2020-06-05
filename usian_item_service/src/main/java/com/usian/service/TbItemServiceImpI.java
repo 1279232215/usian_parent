@@ -9,6 +9,8 @@ import com.usian.mapper.TbItemMapper;
 import com.usian.mapper.TbItemParamItemMapper;
 import com.usian.pojo.*;
 import com.usian.utils.PageResult;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.bjsxt.utils.IDUtils;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,9 @@ public class TbItemServiceImpI implements TbItemService{
 
     @Autowired
     private TbItemCatMapper tbItemCatMapper;
+
+    @Autowired
+    private AmqpTemplate amqpTemplate;
 
     //根据id查询商品基本信息
     @Override
@@ -87,7 +92,13 @@ public class TbItemServiceImpI implements TbItemService{
         System.out.println(tbItemParamItem.getParamData());
         System.out.println(tbItemParamItem+"+++++++++++++++++++++++++++++++++++++");
         int tbItemParamItemNum = tbItemParamItemMapper.insertSelective(tbItemParamItem);
-        System.out.println(tbItemParamItemNum+"-------------------");
+
+
+        //添加之后向usian-search-service发送同步索引消息
+        amqpTemplate.convertAndSend("item_exchange","item.add",itemId);
+
+
+
         return tbItemNum+tbItemDescNum+tbItemParamItemNum;//返回3条insert的执行影响条数
     }
 

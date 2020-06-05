@@ -8,4 +8,6 @@ public interface SearchItemService {
     boolean importAll();
 
     List<SearchItem> selectByQ(String q, Integer page, Integer pageSize);
+
+    boolean insertDocument(String msg);
 }
