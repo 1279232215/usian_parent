@@ -34,4 +34,46 @@ public class SearchListener {
         }
     }
 
+
+
+    /*
+    * 当商品删除之后监听队列
+    * 先创建队列queue绑定到队列上
+    * 根据routingKey获取传输的消息
+    * */
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = "search_queue",declare = "true"),
+            exchange = @Exchange(value = "item_exchange",type = ExchangeTypes.TOPIC),
+            key = {"item.*"}
+    ))
+    public void deleteSynchronized(String msg){
+        boolean b =  searchItemService.deleteSynchronized(msg);
+        if(!b){
+            throw new RuntimeException("商品删除同步失败！！！");
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

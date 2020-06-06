@@ -9,6 +9,8 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import com.bjsxt.utils.JsonUtils;
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
@@ -150,6 +152,24 @@ public class SearchItemServiceImpI implements SearchItemService {
             indexRequest.source(JsonUtils.objectToJson(searchItem),XContentType.JSON);
             IndexResponse response = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
             int failed = response.getShardInfo().getFailed();//错误的条数
+            if(failed==0){
+                return true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /*
+    * 商品删除后，做索引库同步
+    * */
+    @Override
+    public boolean deleteSynchronized(String msg) {
+        try{
+            DeleteRequest deleteRequest = new DeleteRequest(ES_INDEX_NAME,ES_TYPE_NAME,msg);
+            DeleteResponse response = restHighLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
+            int failed = response.getShardInfo().getFailed();
             if(failed==0){
                 return true;
             }

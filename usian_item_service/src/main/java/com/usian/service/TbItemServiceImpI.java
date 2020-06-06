@@ -107,6 +107,7 @@ public class TbItemServiceImpI implements TbItemService{
     public int deleteItemById(Long itemId) {
         //deleteByPrimaryKey()根据id删除
         //deleteByExample()根据条件删除
+        amqpTemplate.convertAndSend("item_exchange","item.delete",itemId);
         return tbItemMapper.deleteByPrimaryKey(itemId);
     }
 

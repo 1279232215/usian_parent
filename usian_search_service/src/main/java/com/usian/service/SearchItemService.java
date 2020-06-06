@@ -10,4 +10,6 @@ public interface SearchItemService {
     List<SearchItem> selectByQ(String q, Integer page, Integer pageSize);
 
     boolean insertDocument(String msg);
+
+    boolean deleteSynchronized(String msg);
 }
