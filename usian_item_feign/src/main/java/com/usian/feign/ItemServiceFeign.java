@@ -1,8 +1,6 @@
 package com.usian.feign;
 
-import com.usian.pojo.TbItem;
-import com.usian.pojo.TbItemCat;
-import com.usian.pojo.TbItemParam;
+import com.usian.pojo.*;
 import com.usian.utils.CatResult;
 import com.usian.utils.PageResult;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -106,4 +104,28 @@ public interface ItemServiceFeign {
      */
     @RequestMapping("/service/itemCat/selectItemCategoryAll")
     CatResult selectItemCategoryAll();
+
+    /**
+     *  根据id查询商品基本参数
+     *  @param itemId
+     *  @return TbItemDesc
+     */
+    @RequestMapping("/service/item/selectItemDescByItemId")
+    TbItemDesc selectItemDescByItemId(@RequestParam Long itemId);
+    /**
+     *  根据id查询商品规格参数
+     *  @param itemId
+     *  @return TbItemParamItem
+     */
+    @RequestMapping("/service/itemParam/selectTbItemParamItemByItemId")
+    TbItemParamItem selectTbItemParamItemByItemId(@RequestParam Long itemId);
+    /**
+     *  根据id修改商品
+     *  @param tbItem
+     *  @param desc
+     *  @param itemParams
+     *  @return int
+     */
+    @RequestMapping("/service/item/updateTbItem")
+    int updateTbItem(TbItem tbItem,@RequestParam String desc,@RequestParam String itemParams);
 }

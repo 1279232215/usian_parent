@@ -2,12 +2,16 @@ package com.usian.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.usian.mapper.TbItemParamItemMapper;
 import com.usian.mapper.TbItemParamMapper;
 import com.usian.pojo.TbItemParam;
 import com.usian.pojo.TbItemParamExample;
 import com.usian.pojo.TbItemParamItem;
+import com.usian.pojo.TbItemParamItemExample;
+import com.usian.redis.RedisClient;
 import com.usian.utils.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +22,24 @@ import java.util.List;
 public class TbItemParamServiceImpI implements TbItemParamService {
     @Autowired
     private TbItemParamMapper tbItemParamMapper;
+
+    @Autowired
+    private TbItemParamItemMapper tbItemParamItemMapper;
+    @Autowired
+    private RedisClient redisClient;
+
+
+    @Value("${PARAM}")
+    private String PARAM;
+
+    @Value("${ITEM_INFO}")
+    private String ITEM_INFO;
+
+    @Value("${ITEM_INFO_EXPIRE}")
+    private Long ITEM_INFO_EXPIRE;
+
+    @Value("${SETNX_PARAM_LOCK_KEY}")
+    private String SETNX_PARAM_LOCK_KEY;
 
     //查询商品规格模板
     @Override
@@ -74,5 +96,45 @@ public class TbItemParamServiceImpI implements TbItemParamService {
     public int deleteItemParamById(Long id) {
         int i = tbItemParamMapper.deleteByPrimaryKey(id);
         return i;
+    }
+
+
+    //根据商品id查询商品规格参数
+    @Override
+    public TbItemParamItem selectTbItemParamItemByItemId(Long itemId) {
+        String key = ITEM_INFO+":"+itemId+":"+PARAM;
+        //查询缓存
+        TbItemParamItem redisTbItemParamItem = (TbItemParamItem)redisClient.get(key);
+        if(redisTbItemParamItem!=null){
+            return redisTbItemParamItem;
+        }
+        /********************解决缓存击穿************************/
+        if(redisClient.setnx(SETNX_PARAM_LOCK_KEY+":"+itemId,itemId,30L)){
+            TbItemParamItemExample tbItemParamItemExample = new TbItemParamItemExample();
+            TbItemParamItemExample.Criteria criteria = tbItemParamItemExample.createCriteria();
+            criteria.andItemIdEqualTo(itemId);
+            List<TbItemParamItem> tbItemParamItemList = tbItemParamItemMapper.selectByExampleWithBLOBs(tbItemParamItemExample);
+            if(tbItemParamItemList!=null && tbItemParamItemList.size()>0){
+                //把数据保存到缓存
+                redisClient.set(key,tbItemParamItemList.get(0));
+                redisClient.expire(key,ITEM_INFO_EXPIRE);
+            }else{
+                //解决缓存穿透
+                //把空对象保存到缓存
+                redisClient.set(key,null);
+                redisClient.expire(key,30L);
+            }
+            redisClient.del(SETNX_PARAM_LOCK_KEY+":"+itemId);
+            return tbItemParamItemList.get(0);
+        }else{
+            try {
+                //等待一秒
+                Thread.sleep(1000);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            //继续访问
+            return selectTbItemParamItemByItemId(itemId);
+        }
     }
 }

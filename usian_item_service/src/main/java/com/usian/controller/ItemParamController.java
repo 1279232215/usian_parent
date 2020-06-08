@@ -2,6 +2,7 @@ package com.usian.controller;
 
 import com.usian.pojo.TbItemCat;
 import com.usian.pojo.TbItemParam;
+import com.usian.pojo.TbItemParamItem;
 import com.usian.service.TbItemCatService;
 import com.usian.service.TbItemParamService;
 import com.usian.service.TbItemService;
@@ -43,5 +44,11 @@ public class ItemParamController {
     @RequestMapping("/deleteItemParamById")
     public int deleteItemParamById(Long id){
         return tbItemParamService.deleteItemParamById(id);
+    }
+
+    //根据商品id查询商品规格参数
+    @RequestMapping("/selectTbItemParamItemByItemId")
+    public TbItemParamItem selectTbItemParamItemByItemId(Long itemId){
+        return tbItemParamService.selectTbItemParamItemByItemId(itemId);
     }
  }

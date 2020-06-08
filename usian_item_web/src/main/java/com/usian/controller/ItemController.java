@@ -63,10 +63,19 @@ public class ItemController {
     @RequestMapping("/preUpdateItem")
     public Result preUpdateItem(Long itemId){
         Map<String,Object> map = itemServiceFeign.preUpdateItem(itemId);//返回map
-        String data = JsonUtils.objectToJson(map);                  //把map转为json传进行返回
         if(map.size()>0&&map!=null){                    //判断map是否为空
-            return Result.ok(data);                 //返回data
+            return Result.ok(map);                 //返回data
         }
         return Result.error("修改回显失败！！！"); //返回错误数据
+    }
+
+    //修改
+    @RequestMapping("/updateTbItem")
+    public Result updateTbItem(TbItem tbItem,String desc,String itemParams){
+        int i = itemServiceFeign.updateTbItem(tbItem,desc,itemParams);
+        if(i==3){
+            return Result.ok();
+        }
+        return Result.error("修改失败！！！");
     }
 }

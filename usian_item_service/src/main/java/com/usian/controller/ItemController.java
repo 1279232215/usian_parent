@@ -1,5 +1,6 @@
 package com.usian.controller;
 
+import com.usian.pojo.TbItemDesc;
 import com.usian.service.TbItemService;
 import com.usian.pojo.TbItem;
 import com.usian.utils.PageResult;
@@ -42,6 +43,11 @@ public class ItemController {
        return tbItemService.insertTbItem(tbItem,desc,itemParams);
     }
 
+    //修改数据TbItem,TbItemDesc,TbItemParam_item
+    @RequestMapping("/updateTbItem")
+    public Integer updateTbItem(@RequestBody TbItem tbItem,String desc,String itemParams){
+        return tbItemService.updateTbItem(tbItem,desc,itemParams);
+    }
     //根据itemId删除TbItem
     @RequestMapping("/deleteItemById")
     public int deleteItemById(@RequestParam Long itemId){
@@ -51,5 +57,11 @@ public class ItemController {
     @RequestMapping("/preUpdateItem")
     public Map<String,Object> preUpdateItem(@RequestParam Long itemId){
         return tbItemService.preUpdateItem(itemId);
+    }
+
+    //根据itemId查询TbItemDesc数据
+    @RequestMapping("/selectItemDescByItemId")
+    public TbItemDesc selectItemDescByItemId(@RequestParam Long itemId){
+        return tbItemService.selectItemDescByItemId(itemId);
     }
 }
