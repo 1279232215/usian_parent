@@ -127,26 +127,31 @@ public class CartWebController {
     @RequestMapping("/showCart")
     public Result showCart(String userId,HttpServletRequest request){
         try {
+            //创建list进行返回
+            List<TbItem> tbItemList = new ArrayList<>();
             if(StringUtils.isBlank(userId)){ //在用户未登录的状态下
                 //先从cookie中获取map集合
                 Map<String, TbItem> cart = getCartForCookie(request);
-                //创建list进行返回
-                List<TbItem> tbItemList = new ArrayList<>();
+
                 //遍历map，存到list
                 Set<String> keys = cart.keySet();
                 for (String key : keys) {
                     tbItemList.add(cart.get(key));
                 }
-                //返回前台
-                return Result.ok(tbItemList);
             }else{// 在用户已登录的状态
-
+                //根据userId获取到对应的map
+                Map<String, TbItem> cart = cartFeign.getCartFromRedis(userId);
+                for (String key : cart.keySet()) {
+                    TbItem tbItem = cart.get(key);
+                    tbItemList.add(tbItem);
+                }
             }
+            //返回前台
+            return Result.ok(tbItemList);
         }catch (Exception e){
             e.printStackTrace();
             return Result.error("查询购物车列表失败！！！");
         }
-        return null;
     }
 
     //修改购物车数量
@@ -164,7 +169,17 @@ public class CartWebController {
                 //把修改后的map在存到cookie
                 addClientCookie(map,request,response);
             }else{// 在用户已登录的状态
-
+                //先获取到map
+                Map<String, TbItem> cart = cartFeign.getCartFromRedis(userId);
+                //根据itemId查找tbItem
+                TbItem tbItem = cart.get(itemId.toString());
+                //进行修改
+                tbItem.setNum(num);
+                //把修改后的值存到Redis中
+                boolean b = cartFeign.addCartToRedis(cart, userId);
+                if(!b){
+                    return Result.error("增加商品数量出错！！！");
+                }
             }
             return Result.ok();
         }catch (Exception e){
@@ -185,7 +200,15 @@ public class CartWebController {
                 //将修改后的map添加到cookie
                 addClientCookie(cart,request,response);
             }else{
-
+                //先查询现有的map
+                Map<String, TbItem> cart = cartFeign.getCartFromRedis(userId);
+                //在map中删除对应itemId
+                cart.remove(itemId.toString());
+                //把删除完后的map重新再写到redis中
+                boolean b = cartFeign.addCartToRedis(cart,userId);
+                if(!b){
+                    return Result.error("删除购物车商品出错！！！");
+                }
             }
             return Result.ok();
         }catch (Exception e){

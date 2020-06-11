@@ -171,10 +171,19 @@
                 根据传过来的itemId,获取到map.remove(itemId)重新赋值到cookie
     5、登录状态操作购物车
          添加商品
-        1、从cookie中查询商品列表：Map<itemId,TbItem> 商品购买数量使用TbItem的num保存
-             购物车已存在则直接返回
-             购物车不存在则创建空的购物车并返回
-             在添加商品到map的时候在判断商品是否重复
+         1、从redis中查询商品列表：Map<itemId,TbItem> 商品购买数量使用TbItem的num保存
+                  购物车已存在则直接返回
+                  购物车不存在则创建空的购物车并返回
+         2、添加商品到购物车：
+                  如果购物车存在该商品，商品数量相加。
+                  如果购物车不存在该商品，根据商品id查询商品信息并添加到购车列表
+         3、把购车商品列表写入redis。
+         4、查看列表
+                  根据传过来的userId获取到map,然后遍历创建list进行存储返回
+         5、修改商品数量
+                  根据传过来的num和itemId先获取到map,根据itemId查对应的value，然后赋值num,重新写到redis
+         6、删除商品
+                  据传过来的itemId,获取到map.remove(itemId)重新赋值到redis
 
 
 
