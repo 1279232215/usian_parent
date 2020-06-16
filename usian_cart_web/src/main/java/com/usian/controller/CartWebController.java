@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.bjsxt.utils.CookieUtils;
+import com.usian.utils.CookieUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -74,10 +74,7 @@ public class CartWebController {
     //根据对应id从redis中查找出map
     private Map<String, TbItem> getCartFromRedis(String userId) {
         Map<String,TbItem> map = cartFeign.getCartFromRedis(userId);
-        if(map!=null && map.size()>0){
-            return map;
-        }
-        return new HashMap<String, TbItem>();
+        return map;
     }
 
 
@@ -114,6 +111,7 @@ public class CartWebController {
     private Map<String, TbItem> getCartForCookie(HttpServletRequest request) {
         //从cookie中查询出
         String cartJson = CookieUtils.getCookieValue(request, CART_COOKIE_KEY, true);
+
         //判断是否为空
         if(StringUtils.isNotBlank(cartJson)){
             Map<String,TbItem> map = JsonUtils.jsonToMap(cartJson, TbItem.class);

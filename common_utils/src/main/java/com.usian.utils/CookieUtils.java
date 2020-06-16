@@ -1,4 +1,4 @@
-package com.bjsxt.utils;
+package com.usian.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
