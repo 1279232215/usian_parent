@@ -184,6 +184,40 @@
                   根据传过来的num和itemId先获取到map,根据itemId查对应的value，然后赋值num,重新写到redis
          6、删除商品
                   据传过来的itemId,获取到map.remove(itemId)重新赋值到redis
+    6、cookie同步到redis中
+        1、先从cookie中查询出数据
+        2、再从登录返回中的map获取userId，根据id查询出redis中购物车的信息
+        3、遍历cookieMap中所有的key,cookieMap和redisMap根据key获取到tbItem
+        4、看redisMap是否能根据cookieMap遍历的key获取到数据，如果能则添加数量，不能则向redisMap中添加新值
+        5、去覆盖redis中的map
+        6、删除cookie中的数据
+2020-06-10
+    订单分析
+      订单功能
+    1、在购物车页面点击“去结算”按钮跳转到订单确认页面
+    	a) 展示商品列表
+    	b) 配送地址列表
+        c) 选择支付方式
+    2、订单确认页面需要根据用户查询配送地址，展示订单确认页面之前，应该确认用户身份
+    	a) 如果用户未登录或登录过期跳转到登录页面
+    	d) 登录成功后再跳转到订单确认页面
+    3、提交订单
+    	a) 生成订单
+    4、扣减库存
+    5、关闭超时订单
+    	a) 定时扫描超时2天未付款的订单，并关闭订单
+    	b) 加回库存
+    6、新建工程: usian-order-service,usian-order-web,usian-order-feign
+    7、用户身份认证
+        1、使用springmvc的拦截器拦截所有订单的请求
+        2、业务逻辑
+           a) 从cookie中取token。
+           b) 根据token调用sso服务查询用户信息。
+           d) 如果查不到用户信息则跳转到登录页面。
+           e) 查询到用户信息放行。
+    8、用户登录后点击去结算，展示结算数据
+        8.1根据传过来的userId去获取redis中存的map
+        8.2创建list，然后遍历商品ids,根据遍历的id获取redisCar中的数据，存到list中进行返回
 
 
 
