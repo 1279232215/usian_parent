@@ -237,10 +237,22 @@
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.usian.pojo.TbOrderExample" resultType="java.lang.Integer" >
-    select count(*) from tb_order
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
+  select count(*) from tb_order
+  <if test="_parameter != null" >
+    <include refid="Example_Where_Clause" />
+  </if>
+</select>
+  <select id="selectOverTbOrder" resultMap="BaseResultMap">
+    SELECT
+      *
+    FROM
+      tb_order
+    WHERE
+      create_time &lt;= DATE_SUB( NOW( ), INTERVAL 2 DAY )
+    AND
+      STATUS = 1
+    AND
+      payment_type = 1
   </select>
   <update id="updateByExampleSelective" parameterType="map" >
     update tb_order

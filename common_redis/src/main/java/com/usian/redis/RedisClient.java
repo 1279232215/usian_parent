@@ -148,6 +148,13 @@ public class RedisClient {
         }
     }
 
+    /*
+    * 判断key是否存在
+    * */
+    public boolean exists(String key){
+        return redisTemplate.hasKey(key);
+    }
+
     /**
      * 删除hash表中的值
      * @param key 键 不能为null

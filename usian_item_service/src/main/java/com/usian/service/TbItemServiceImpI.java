@@ -4,10 +4,7 @@ import com.bjsxt.utils.JsonUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.netflix.discovery.converters.Auto;
-import com.usian.mapper.TbItemCatMapper;
-import com.usian.mapper.TbItemDescMapper;
-import com.usian.mapper.TbItemMapper;
-import com.usian.mapper.TbItemParamItemMapper;
+import com.usian.mapper.*;
 import com.usian.pojo.*;
 import com.usian.redis.RedisClient;
 import com.usian.utils.PageResult;
@@ -35,6 +32,9 @@ public class TbItemServiceImpI implements TbItemService{
 
     @Autowired
     private TbItemDescMapper tbItemDescMapper;
+
+    @Autowired
+    private TbOrderItemMapper tbOrderItemMapper;
 
     @Autowired
     private TbItemParamItemMapper tbItemParamItemMapper;
@@ -273,6 +273,32 @@ public class TbItemServiceImpI implements TbItemService{
         //调用redis同步方法
         redisSynchronized(tbItem.getId());
         return tbItemNum+tbItemDescNum+tbItemParamItemNum;//返回3条insert的执行影响条数
+    }
+
+
+    //结算购物车商品，对数据库的商品库存进行扣除
+    @Override
+    public Integer updateTbItemByOrderId(String orderId) {
+        //先根据orderId查询出结算的商品
+        TbOrderItemExample tbOrderItemExample = new TbOrderItemExample();
+        TbOrderItemExample.Criteria criteria = tbOrderItemExample.createCriteria();
+        criteria.andOrderIdEqualTo(orderId);
+        List<TbOrderItem> tbOrderItemList = tbOrderItemMapper.selectByExample(tbOrderItemExample);
+        //遍历结算的商品
+        int result = 0;
+        for (TbOrderItem tbOrderItem : tbOrderItemList) {
+            //获取到商品的id
+            String itemId = tbOrderItem.getItemId();
+            //根据itemId查询出商品信息
+            TbItem tbItem = tbItemMapper.selectByPrimaryKey(Long.valueOf(itemId));
+            System.out.println(tbItem);
+            //对查询出的商品进行扣减
+            System.out.println(tbItem.getNum());System.out.println(tbOrderItem.getNum());
+            tbItem.setNum(tbItem.getNum()-tbOrderItem.getNum());
+            //扣减之后调用方法进行修改tbItem的值
+            result += tbItemMapper.updateByPrimaryKeySelective(tbItem);
+        }
+        return result;
     }
 
 
