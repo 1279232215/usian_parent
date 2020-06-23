@@ -11,13 +11,16 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate.ConfirmCallback;
 import org.springframework.amqp.rabbit.core.RabbitTemplate.ReturnCallback;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.bjsxt.utils.JsonUtils;
+import com.usian.utils.JsonUtils;
+import org.springframework.stereotype.Component;
+
 /*
 * 任务
 *   1、发送消息
 *   2、消息确认成功返回后修改local_message(status:1)
 *
 * */
+@Component
 public class MQSender implements ReturnCallback,ConfirmCallback {
 
     @Autowired
@@ -30,8 +33,10 @@ public class MQSender implements ReturnCallback,ConfirmCallback {
     * 失败回调 ：消息发送消息失败时调用
     * */
     @Override
-    public void returnedMessage(Message message, int i, String s, String s1, String s2) {
-
+    public void returnedMessage(Message message, int replyCode, String replyText,
+                                String exchange, String routingKey) {
+        System.out.println("return--message:" + new String(message.getBody())
+                + ",exchange:" + exchange + ",routingKey:" + routingKey);
     }
 
     /*
@@ -40,7 +45,6 @@ public class MQSender implements ReturnCallback,ConfirmCallback {
     @Override
     public void confirm(CorrelationData correlationData, boolean ack, String s) {
         String id = correlationData.getId();
-
         if(ack){
             //修改本地消息表的状态
             LocalMessage localMessage = new LocalMessage();

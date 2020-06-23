@@ -1,8 +1,9 @@
 package com.usian.controller;
-import com.bjsxt.utils.Result;
+import com.usian.utils.Result;
 import com.usian.feign.ItemServiceFeign;
 import com.usian.pojo.TbItemParam;
 import com.usian.utils.PageResult;
+import com.usian.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,5 +1,5 @@
 package com.usian.controller;
-import com.bjsxt.utils.Result;
+import com.usian.utils.Result;
 import com.usian.feign.CartFeign;
 import com.usian.feign.SSOFeign;
 import com.usian.pojo.TbItem;
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.bjsxt.utils.JsonUtils;
+import com.usian.utils.JsonUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;

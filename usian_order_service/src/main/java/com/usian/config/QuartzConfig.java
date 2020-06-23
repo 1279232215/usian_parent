@@ -35,7 +35,7 @@ public class QuartzConfig {
     public CronTriggerFactoryBean getCronTriggerFactoryBean(JobDetailFactoryBean jobDetailFactoryBean){
         CronTriggerFactoryBean cronTriggerFactoryBean = new CronTriggerFactoryBean();
         //写cron表达式
-        cronTriggerFactoryBean.setCronExpression("*/1 * * * * ?");
+        cronTriggerFactoryBean.setCronExpression("*/5 * * * * ?");
         //把job封装到Trigger里
         cronTriggerFactoryBean.setJobDetail(jobDetailFactoryBean.getObject());
         return cronTriggerFactoryBean;

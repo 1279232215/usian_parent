@@ -1,6 +1,6 @@
 package com.usian.controller;
-import com.bjsxt.utils.JsonUtils;
-import com.bjsxt.utils.Result;
+import com.usian.utils.JsonUtils;
+import com.usian.utils.Result;
 import com.netflix.discovery.converters.Auto;
 import com.usian.feign.CartFeign;
 import com.usian.feign.ItemServiceFeign;

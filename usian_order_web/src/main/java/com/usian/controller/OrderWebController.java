@@ -1,6 +1,6 @@
 package com.usian.controller;
 
-import com.bjsxt.utils.Result;
+import com.usian.utils.Result;
 import com.usian.feign.CartFeign;
 //import com.usian.feign.OrderServiceFeign;
 import com.usian.feign.OrderServiceFeign;

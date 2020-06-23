@@ -301,5 +301,33 @@
     		本地消息表：消息记录表（orderId、status） + quartz（定时扫描、再发送消息）
     	7.2、下游服务把消息成功消费
     		持久化+手动确认方案：持久化（mq宕机消息不丢失）、手动确认（任务处理失败消息还在容器中）
-    	7.3、消息做幂
-    		 消息去重表
+    	7.3、消息去重息做幂表
+2020-06-22
+    一、ELK技术栈的介绍
+   	1、什么是ELK
+   		elasticsearch：全文检索服务器
+   		kibana：对es存储的数据进行可视化分析
+   		logstash：负责搜集日志，并将数据发送给es
+   	2、为什么要使用elk？
+   		分布式环境日志比较分散
+   		大日志搜索太慢
+   		无法多维度搜索
+   	3、springcloud整合elk
+   		a、pom.xml
+   			logstash-logback-encoder
+   		b、logback.xml
+   			<root level="DEBUG">
+   				<appender-ref ref="Stdout" />
+   				<appender-ref ref="RollingFile" />
+   				<appender-ref ref="logstash" />
+   			</root>
+2020-06-23
+    网关服务
+    1、路由
+        所有请求都通过网关访问服务的consumer
+    2、限流
+        网关每秒只能有一个请求对consumer进行访问
+    3、容错
+        客户端通过zuul无法调用consumer时，使用zuul对consumer进行降级
+    4、熔断
+        通过 Hystrix 对provider做降级处理

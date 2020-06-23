@@ -1,8 +1,8 @@
 package com.usian.controller;
-import com.bjsxt.utils.JsonUtils;
+import com.usian.utils.JsonUtils;
 import com.usian.feign.ItemServiceFeign;
 import com.usian.pojo.TbItem;
-import com.bjsxt.utils.Result;
+import com.usian.utils.Result;
 import com.usian.utils.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -5,7 +5,7 @@ import com.usian.utils.CatResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.bjsxt.utils.Result;
+import com.usian.utils.Result;
 @RestController
 @RequestMapping("/frontend/itemCategory")
 public class ItemCategoryController {

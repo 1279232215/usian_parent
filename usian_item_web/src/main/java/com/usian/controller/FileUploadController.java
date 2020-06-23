@@ -1,7 +1,8 @@
 package com.usian.controller;
-import com.bjsxt.utils.Result;
+import com.usian.utils.Result;
 import com.github.tobato.fastdfs.domain.StorePath;
 import com.github.tobato.fastdfs.service.FastFileStorageClient;
+import com.usian.utils.Result;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

@@ -1,4 +1,4 @@
-package com.bjsxt.utils;
+package com.usian.utils;
 
 import java.util.HashMap;
 import java.util.List;

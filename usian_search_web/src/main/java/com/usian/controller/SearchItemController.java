@@ -1,6 +1,6 @@
 package com.usian.controller;
 
-import  com.bjsxt.utils.Result;
+import  com.usian.utils.Result;
 import com.usian.SearchFeign;
 import com.usian.pojo.SearchItem;
 import org.bouncycastle.asn1.sec.SECNamedCurves;

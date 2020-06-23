@@ -1,5 +1,5 @@
 package com.usian.controller;
-import com.bjsxt.utils.Result;
+import com.usian.utils.Result;
 import com.usian.feign.ContentServiceFeign;
 import com.usian.pojo.TbContentCategory;
 import org.springframework.beans.factory.annotation.Autowired;
