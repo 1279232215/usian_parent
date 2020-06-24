@@ -330,4 +330,104 @@
     3、容错
         客户端通过zuul无法调用consumer时，使用zuul对consumer进行降级
     4、熔断
-        通过 Hystrix 对provider做降级处理
+        通过 Hystrix 对provider做降级处理、
+2020-06-24
+    MySql主从复制
+    下载地址：https://dev.mysql.com/downloads/mysql/
+    1、卸载预装mysql
+        #查看已安装：
+        [root@centos upload]# rpm -qa|grep mysql
+        #卸载：
+        [root@centos upload]# rpm -e --nodeps mysql-libs-5.1.71-1.el6.x86_64
+        #再次查看：
+        [root@centos upload]# rpm -qa|grep mysql
+    2、解压安装包
+        [root@centos upload]# tar -zxvf mysql-5.6.31-linux-glibc2.5-x86_64.tar.gz -C /usr/java
+        [root@centos upload]# cd /usr/java
+        [root@centos java]# mv mysql-5.6.31-linux-glibc2.5-x86_64 mysql
+    3、复制mysql的配置文件
+        [root@centos java]# cd mysql
+        [root@centos java]# cp support-files/my-default.cnf /etc/my.cnf
+        [root@centos java]# cp support-files/mysql.server /etc/rc.d/init.d/mysql
+    4、修改my.cnf
+        vim /etc/my.cnf
+
+        basedir = /usr/java/mysql
+        datadir = /usr/java/mysql/data
+        log-error = /usr/java/mysql/data/error.log
+        pid-file = /usr/java/mysql/data/mysql.pid
+        user = root
+        tmpdir = /tmp
+    5、初始化数据库
+         [root@centos java]# cd /usr/java/mysql
+         [root@centos mysql]# ./scripts/mysql_install_db --user=root
+         --basedir=/usr/java/mysql --datadir=/usr/java/mysql/data
+         --pid-file=/usr/java/mysql/data/mysql.pid --tmpdir=/tmp
+    6、启动和关闭mysql
+        [root@centos mysql]# service mysql start
+        Starting MySQL..                                          [确定]
+        [root@centos mysql]# service mysql stop
+        Shutting down MySQL..                                     [确定]
+        [root@centos mysql]# service mysql restart
+        Shutting down MySQL..
+        Starting MySQL..                                          [确定]
+    7、配置mysql命令支持
+        如果提示没有mysql命令，需要添加软连接
+        [root@centos mysql]# ln -s /usr/java/mysql/bin/mysql /usr/bin/mysql
+    8、修改MySQL密码
+        [root@centos upload]# mysql -u root
+        mysql> use mysql;
+        mysql> update user set password= password("1111") where user='root';
+        mysql> flush privileges;
+    9、开放远程登录权限
+        mysql>GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '1111' WITH GRANT OPTION;
+        mysql>FLUSH PRIVILEGES;
+    10、设置开机启动
+        [root@centos mysql]# chkconfig mysql on
+    MySQL主从复制
+    1、mysql主从简介
+        1. MySQL 默认支持主(master)从(slave)功能.
+        2. 主从复制效果：在主数据库中操作时,从同步进行变化.
+        3. 主从复制本质：主数据的操作写入到日志中,从数据库从日志中读取,进行操作.
+    2、主从备份要素：
+        1. 开启日志功能
+        2. 每个数据库需要有一个 server_id,主 server_id 值小于从server_id(标识从哪server写入的)
+        3. 每个 mysql 都有一个 uuid,由于虚拟机直接进行克隆,需要修改uuid 的值(唯一识别码)
+        4. 必须要在主数据库中有一个用户具有被从数据库操作的权限.
+    3、克隆mysql1的虚拟机
+        作为从数据库
+    4、配置主数据库
+        修改主数据库的my.cnf文件
+        log_bin=master_log
+        server_id=1
+        重启mysql
+        [root@centos upload]# service mysql restart
+
+    5、配置从数据库
+        1、修改server_id
+            server_id=2
+        2、data文件夹auto.cnf编写当前mysql的uuid
+            server-uuid=b144a074-6ebe-11e9-b501-000c293cc59c
+        3、重启mysql
+            [root@centos upload]# service mysql restart
+        4、修改slave
+            mysql> stop slave;
+            mysql> change master to master_host='192.168.233.137',master_user='root',master_password='1111',master_log_file='master_log.000001';
+            mysql> start slave;
+        5、查看slave状态
+            mysql>show slave status \G;
+                io线程和sql线程已开启：
+                Slave_IO_Running:Yes
+                Slave_SQL_Running:Yes
+                Last_IO_Errno:0
+                Last_IO_Error:
+                Last_SQL_Errno:0
+                Last_SQL_Error:
+                只要没有错误,说明配置成功主从关系：
+        6、验证主从关系
+              在主数据库中新建数据库,新建表,添加数据,观察从数据库的
+
+
+
+
+
