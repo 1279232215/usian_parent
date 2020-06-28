@@ -1,6 +1,6 @@
 package com.usian.service;
 
-import com.bjsxt.utils.JsonUtils;
+import com.usian.utils.JsonUtils;
 import com.usian.pojo.TbItem;
 import com.usian.redis.RedisClient;
 import org.apache.commons.lang.StringUtils;

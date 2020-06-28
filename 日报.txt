@@ -427,7 +427,225 @@
         6、验证主从关系
               在主数据库中新建数据库,新建表,添加数据,观察从数据库的
 
+        MyCat
+        1、MyCat简介
+               MyCAT是一个数据库中间件。国产开源项目，前身是cobar项目。
+        2、Mycat对多数据库的支持
+            MySQL、甲骨文、SQLServer、PostgreSQL、mongoDB
+        3、MyCAT架构
+            如图所示：MyCAT使用Mysql的通讯协议模拟成了一个Mysql服务器，所有能使用Mysql的客户端
+            以及编程语言都能将MyCAT当成是Mysql Server来使用，不必开发新的客户端协议。
+        4、MyCat分库分表
+            垂直分割（分库）：指按照业务将表进行分类，分布到不同的数据库上面，这样也就将数据或者
+        说压力分担到不同的库上面，就是将不同业务的表分配到不同的库中。
+            水平分割（分表）：一个表格的数据按照行分割到多个节点上，就是将表中的数据平均分到不同库中。
+        典型的分片规则：
+        	根据主键编号进行hash、求余，如hash(key)%5
+        5、MyCat安装
+            5.1、下载mycat
+                官方网站：http://www.mycat.org.cn/
+                github地址：https://github.com/MyCATApache
+            5.2、安装Mycat
+                1、把MyCat的压缩包上传到linux服务器
+                2、解压缩，得到mycat目录
+                [root@centos upload]# tar -zxvf Mycat-server-1.6-RELEASE-20161028204710-linux.tar.gz -C /usr/java
+                3、启动和关闭MyCat
+                    进入mycat/bin，启动MyCat
+                    启动命令：./mycat start
+                    停止命令：./mycat stop
+                    重启命令：./mycat restart
+                    查看状态：./mycat status
+                4、Mycat分库分表和读写分离
+                    需求：把商品表分片存储到两个数据节点上。
+                    安装环境：
+                    mysql节点1环境
+                        操作系统版本 : centos6.5
+                        数据库版本 :mysql-5.6
+                        数据库名 : db1
+                        ip:192.168.25.134
+                    mysql节点2环境
+                        操作系统版本 :centos6.5
+                        数据库版本 :mysql-5.6
+                        数据库名 : db2
+                        ip:192.168.25.135
+                    mysql节点3环境
+                        操作系统版本 :centos6.5
+                        数据库版本 :mysql-5.6
+                        数据库名 : db3
+                        ip:192.168.25.136
+                    mycat节点环境
+                        操作系统版本 :centos6.5
+                        mycat版本：1.6release
+                        ip:192.168.25.137
+                5、MyCat重要概念
+                    1、逻辑库（schema）：一个包含了所有数据库的逻辑上的数据库
+                    2、逻辑表（table）：一个包含了所有表的逻辑上的表
+                    3、数据主机（dataHost）：数据库软件安装到哪个服务器上
+                    4、数据节点（dataNode）：数据库软件中的 database
+                    5、分片规则（rule）：拆分规则
+                6、配置schema.xml
+                    Schema.xml介绍：Schema.xml作为MyCat中重要的配置文件之一，管理着MyCat的逻辑库、表、分片规则、DataNode以及DataSource。
+                    schema.xml配置
+                        <?xml version="1.0"?>
+                        <!DOCTYPE mycat:schema SYSTEM "schema.dtd">
+                        <mycat:schema xmlns:mycat="http://io.mycat/">
+                        	<schema name="usian" checkSQLschema="false" sqlMaxLimit="100">
+                                 <table name="tb_content" dataNode="dn1,dn2,dn3" rule="crc32slot" />
+                        		<table name="tb_content_category" dataNode="dn1,dn2,dn3" rule="crc32slot1"/>
+                        		<table name="tb_item" dataNode="dn1,dn2,dn3" rule="crc32slot2" />
+                        		<table name="tb_item_cat" dataNode="dn1,dn2,dn3" rule="crc32slot3" />
+                        		<table name="tb_item_desc" dataNode="dn1,dn2,dn3" rule="crc32slot4"  />
+                        		<table name="tb_item_param" dataNode="dn1,dn2,dn3" rule="crc32slot5"  />
+                        		<table name="tb_item_param_item" dataNode="dn1,dn2,dn3" rule="crc32slot6" />
+                        		<table name="tb_order" dataNode="dn1,dn2,dn3" rule="crc32slot7" />
+                        		<table name="tb_order_item" dataNode="dn1,dn2,dn3" rule="crc32slot8" />
+                        		<table name="tb_order_shipping" dataNode="dn1,dn2,dn3" rule="crc32slot9" />
+                        		<table name="tb_user" dataNode="dn1,dn2,dn3" rule="crc32slot10" />
+                        	</schema>
+                        	<dataNode name="dn1" dataHost="localhost1" database="db1" />
+                        	<dataNode name="dn2" dataHost="localhost1" database="db2" />
+                        	<dataNode name="dn3" dataHost="localhost1" database="db3" />
+                        	<dataHost name="localhost1" maxCon="1000" minCon="10" balance="0"
+                        		writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
+                        		<heartbeat>select user()</heartbeat>
+                        		<writeHost host="hostM1" url="192.168.233.137:3306" user="root" password="1111">
+                        			<readHost host="hostS2" url="192.168.233.138:3306" user="root" password="1111" />
+                        		</writeHost>
+                        	</dataHost>
+                        </mycat:schema>
+                7、配置server.xml
+                    server.xml介绍
+                        server.xml几乎保存了所有mycat需要的系统配置信息。最常用的是在此配置用户名、密码及权限。
+                    server.xml配置
+                        <user name="root">
+                            <property name="password">1111</property>
+                            <property name="schemas">usian</property>
+                        </user>
+                        <user name="user">
+                            <property name="password">1111</property>
+                            <property name="schemas">usian</property>
+                            <property name="readOnly">true</property>
+                        </user>
+                8、配置rule.xml
+                    分片规则
+                    auto-sharding-long 规则
+                        以 500 万为单位,实现分片规则：
+                        1-500 万保存在 db1 中, 500 万零 1 到 1000 万保存在 db2 中,1000 万零 1 到 1500 万保存在 db3 中.
+                    crc32slot  规则
+                        在 CRUD 操作时,根据具体数据的 crc32 算法计算,数据应该保存在哪一个dataNode 中
+                    rule.xml配置
+                        1）<columns>id</columns>中推荐配置主键列
+                        2）所有的 tableRule 只能使用一次。如果需要为多个表配置相同的分片规则，那么需要在此重新定义该规则。
+                        3) 要分片的数据库节点数量，必须指定，否则没法分片
+                    <tableRule name="crc32slot1">
+                        <rule>
+                        	<columns>id</columns>
+                        	<algorithm>crc32slot</algorithm>
+                        </rule>
+                    </tableRule>
+                    <tableRule name="crc32slot2">
+                        <rule>
+                       	 	<columns>id</columns>
+                       		<algorithm>crc32slot</algorithm>
+                        </rule>
+                    </tableRule>
+                    <tableRule name="crc32slot3">
+                        <rule>
+                        	<columns>id</columns>
+                        	<algorithm>crc32slot</algorithm>
+                        </rule>
+                    </tableRule>
+                    <tableRule name="crc32slot4">
+                        <rule>
+                        	<columns>item_id</columns>
+                        	<algorithm>crc32slot</algorithm>
+                        </rule>
+                    </tableRule>
+                    <tableRule name="crc32slot5">
+                        <rule>
+                        	<columns>id</columns>
+                        	<algorithm>crc32slot</algorithm>
+                        </rule>
+                    </tableRule>
+                    <tableRule name="crc32slot6">
+                        <rule>
+                        	<columns>id</columns>
+                        	<algorithm>crc32slot</algorithm>
+                        </rule>
+                    </tableRule>
+                    <tableRule name="crc32slot7">
+                        <rule>
+                        	<columns>order_id</columns>
+                        	<algorithm>crc32slot</algorithm>
+                        </rule>
+                    </tableRule>
+                    <tableRule name="crc32slot8">
+                        <rule>
+                        	<columns>id</columns>
+                        	<algorithm>crc32slot</algorithm>
+                        </rule>
+                    </tableRule>
+                    <tableRule name="crc32slot9">
+                        <rule>
+                        	<columns>order_id</columns>
+                        	<algorithm>crc32slot</algorithm>
+                        </rule>
+                    </tableRule>
+                    <tableRule name="crc32slot10">
+                        <rule>
+                        	<columns>id</columns>
+                        	<algorithm>crc32slot</algorithm>
+                        </rule>
+                    </tableRule>
 
-
-
-
+                    <function name="crc32slot" class="io.mycat.route.function.PartitionByCRC32PreSlot">
+                        <property name="count">3</property><!-- 要分片的数据库数量，必须指定，否则没法分片 -->
+                    </function>
+                9、测试
+                     创建库  在主数据库中分别创建db1、db2、db3
+                    创建表并插入数据
+                        配置完毕后，重新启动mycat。
+                        使用mysql客户端连接mycat，创建表并插入数据。
+                    项目测试
+                        修改数据库url
+                        spring:
+                          application:
+                            name: usian-item-service
+                          datasource:
+                            driver-class-name: com.mysql.jdbc.Driver
+                            url: jdbc:mysql://192.168.233.139:8066/usian?characterEncoding=UTF-8
+                            username: root
+                            password: 1111
+                            type: com.alibaba.druid.pool.DruidDataSource
+2020-06-28
+    Swagger
+    1、Swagger是什么？
+        Swagger[ˈswæɡə(r)，丝袜哥] ：是一个实现了OpenAPI规范的工具集
+        ，用于生成API文档并提供可视化 RESTful 风格的 Web 服务。
+    2、为什么要使用Swagger？
+        随着互联网技术的发展，现在的网站架构基本都由原来的后端渲染，变成了：前端渲染、前后端分离的形态，而且前端技术和后端技术在各自的道路上越走越远。
+        前端和后端的唯一联系，变成了API接口；API文档变成了前后端开发人员联系的纽带，变得越来越重要。
+        没有API文档工具之前，大家都是手写API文档的，在什么地方书写的都有，而且API文档没有统一规范和格式，每个公司都不一样。
+    3、Swagger使用
+        springfox-swagger2
+        springfox-swagger-ui
+    4、配置Swagger配置类
+        SwaggerConfig
+    5、常用注解说明
+         @Api：修饰整个类，描述Controller的作用
+         @ApiOperation：描述一个类的一个方法，或者说一个接口
+         @ApiParam：单个参数描述
+         @ApiImplicitParam：单个参数描述
+         @ApiImplicitParams：多个参数描述
+         @ApiModel：用对象来接收参数
+         @ApiModelProperty：用对象接收参数时，描述对象的一个字段
+         @ApiResponse：HTTP响应其中1个描述
+         @ApiResponses：HTTP响应整体描述
+    6、网关服务
+        需求:
+            路由：所有请求都通过网关访问服务的consumer
+            容错：客户端通过zuul无法调用consumer时，使用zuul对consumer进行降级
+            限流：使用令牌桶算法实现zuul对consumer的限流
+    7、熔断处理
+        降级：通过 Hystrix 对provider做降级处理
+        熔断：通过 Hystrix 对provider做熔断处理

@@ -4,8 +4,11 @@ import com.usian.feign.ItemServiceFeign;
 import com.usian.pojo.TbItem;
 import com.usian.utils.Result;
 import com.usian.utils.PageResult;
+import io.swagger.annotations.*;
+import org.bouncycastle.cert.ocsp.Req;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,6 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/backend/item")
+@Api("后台商品管理接口")
 public class ItemController {
 
     //feign接口
@@ -20,7 +24,9 @@ public class ItemController {
     private ItemServiceFeign itemServiceFeign;
 
     //根据id查询商品基本信息
-    @RequestMapping("/selectItemInfo")
+    @RequestMapping(value = "/selectItemInfo",method = RequestMethod.POST)
+    @ApiOperation(value = "查询商品基本信息",notes = "根据商品id查询商品信息")
+    @ApiImplicitParam(name = "itemId",type = "Long",value = "商品id")
     public Result selectItemInfo(Long itemId){
         TbItem tbItem = itemServiceFeign.selectItemInfo(itemId);//传去itemId查出Item
         if(tbItem!=null){             //判断返回值是否为null
@@ -30,7 +36,12 @@ public class ItemController {
     }
 
     // 分页查询TbItem商品数据
-    @RequestMapping("selectTbItemAllByPage")//page是当前页，默认为第1页，rows是当前展示几条，默认为2条
+    @RequestMapping(value = "selectTbItemAllByPage",method = RequestMethod.GET)//page是当前页，默认为第1页，rows是当前展示几条，默认为2条
+    @ApiOperation(value = "分页查询商品信息",notes = "根据查询第几页，每页查询第几条，查询数据")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "page",value = "page是当前页",type = "Integer"),
+        @ApiImplicitParam(name = "rows",value = "rows是当前展示几条",type = "Long")
+    })
     public Result selectTbItemAllByPage(@RequestParam(value = "page",defaultValue = "1",required = true) Integer page,
                                         @RequestParam(value = "rows",defaultValue = "2",required = true) Long rows){
         PageResult pageResult = itemServiceFeign.selectTbItemAllByPage(page,rows);//去调用feign接口,实现查询
@@ -39,9 +50,13 @@ public class ItemController {
         }
         return Result.error("查无数据!!!");//返回错误提示
     }
-
     //添加TbItem和TbDesc和TbParam_Item表数据,表现层接受参数，前台不是json传就不能用@requestBody
-    @RequestMapping("/insertTbItem")
+    @RequestMapping(value = "/insertTbItem",method = RequestMethod.POST)
+    @ApiOperation(value = "添加商品信息",notes = "根据商品基本信息，规格参数，描述信息，进行插入")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "desc",value = "商品描述信息",type = "String"),
+            @ApiImplicitParam(name = "itemParams",value = "商品规格参数",type = "String")
+    })
     public Result insertTbItem(TbItem tbItem,String desc,String itemParams){
         Integer s = itemServiceFeign.insertTbItem(tbItem,desc,itemParams);//因为插入3个表中的数据，是3条insert所以返回为3
         if(s==3){//判断返回值是否是3

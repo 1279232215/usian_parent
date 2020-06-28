@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.bjsxt.utils.Result;
+import com.usian.utils.Result;
 import java.util.List;
 @RequestMapping("/service/contentCategory")
 @RestController

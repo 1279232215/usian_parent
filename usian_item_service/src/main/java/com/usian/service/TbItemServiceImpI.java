@@ -1,6 +1,6 @@
 package com.usian.service;
 
-import com.bjsxt.utils.JsonUtils;
+import com.usian.utils.JsonUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.netflix.discovery.converters.Auto;
