@@ -51,7 +51,7 @@ public class ItemController {
         return Result.error("查无数据!!!");//返回错误提示
     }
     //添加TbItem和TbDesc和TbParam_Item表数据,表现层接受参数，前台不是json传就不能用@requestBody
-    @RequestMapping(value = "/insertTbItem",method = RequestMethod.POST)
+    @RequestMapping(value = "/insertTbItem",method = RequestMethod.GET)
     @ApiOperation(value = "添加商品信息",notes = "根据商品基本信息，规格参数，描述信息，进行插入")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "desc",value = "商品描述信息",type = "String"),

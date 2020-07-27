@@ -649,3 +649,13 @@
     7、熔断处理
         降级：通过 Hystrix 对provider做降级处理
         熔断：通过 Hystrix 对provider做熔断处理
+2020-06-28
+    1、分布式配置中心 config
+        需求分析
+        1. 集中管理配置文件
+        2. 不同环境不同配置，比如dev/test/prod/beta/release等
+    2、上传配置文件到github
+    3、搭建配置中心工程common_config
+    4、消息总线 bus
+        需求分析
+        运行期间当配置发生变动时，服务器不需要重启即可同步配置的变化
